@@ -26,12 +26,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.listycity.ui.theme.ListyCityTheme
-
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.graphics.Color
 @Composable
 fun CityListScreen(
     cities: List<City>,
     onAddCity: (City) -> Unit,
     onUpdateCity: (City, City) -> Unit,
+    onClear: (City) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var newCityName by remember { mutableStateOf("") }
@@ -85,6 +87,10 @@ fun CityListScreen(
 
                 Button(
                     modifier = Modifier.padding(vertical = 12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Magenta,
+                        contentColor = Color.White
+                    ),
                     onClick = {
                         if (newCityName.isNotBlank() && newProvinceName.isNotBlank()) {
                             onAddCity(
@@ -130,6 +136,10 @@ fun CityListScreen(
 
                 Button(
                     modifier = Modifier.padding(vertical = 12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Magenta,
+                        contentColor = Color.White
+                    ),
                     onClick = {
                         val cityToUpdate = selectedCity
                         if (
@@ -155,7 +165,7 @@ fun CityListScreen(
                 }
             }
         }
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(modifier = Modifier.weight(1f)) {
             itemsIndexed(cities) { index, city ->
                 CityRow(
                     city = city,
@@ -171,6 +181,32 @@ fun CityListScreen(
                 if (index < cities.lastIndex) {
                     HorizontalDivider()
                 }
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(
+                modifier = Modifier.padding(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Magenta,
+                    contentColor = Color.White
+                ),
+                enabled = selectedCity != null,
+
+                onClick = {
+                    val cityToDelete = selectedCity
+
+                    if (cityToDelete != null) {
+                        onClear(cityToDelete)
+                        selectedCity = null
+                        editedCityName = ""
+                        editedProvinceName = ""
+                    }
+                }
+            ) {
+                Text("DELETE CITY")
             }
         }
     }
@@ -213,7 +249,8 @@ fun CityListScreenPreview() {
                 City("Calgary", "AB")
             ),
             onAddCity = {},
-            onUpdateCity = { _, _ -> }
+            onUpdateCity = { _, _ -> },
+            onClear = {}
         )
     }
 }
